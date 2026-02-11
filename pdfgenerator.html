@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAPUL TI - Relatórios</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* Estilos específicos para relatórios */
+        .report-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .report-header {
+            background: linear-gradient(135deg, #0a4d2c 0%, #1a7a44 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .report-filters {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .report-preview {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .stats-report {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-report-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            border-left: 4px solid #1a7a44;
+        }
+        
+        .month-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-pdf {
+            background: #dc2626;
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-pdf:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(220,38,38,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .stats-report {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .report-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <!-- HEADER -->
+        <div class="report-header">
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-chart-bar"></i>
+                    RELATÓRIOS CAPUL TI
+                </h1>
+                <p style="opacity: 0.9;">Cooperativa Agropecuária de Unaí - Manutenção</p>
+            </div>
+            <a href="index.html" class="btn" style="background: white; color: #1a7a44; padding: 0.75rem 1.5rem; border-radius: 2rem; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i>
+                Voltar
+            </a>
+        </div>
+        
+        <!-- FILTROS -->
+        <div class="report-filters">
+            <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: #1a7a44;">
+                <i class="fas fa-filter"></i>
+                Filtrar Relatório
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div class="form-group">
+                    <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                        <i class="fas fa-calendar"></i> Mês
+                    </label>
+                    <select id="reportMonth" class="filter-select">
+                        <option value="all">Todos os Meses</option>
+                        <option value="01">Janeiro</option>
+                        <option value="02">Fevereiro</option>
+                        <option value="03">Março</option>
+                        <option value="04">Abril</option>
+                        <option value="05">Maio</option>
+                        <option value="06">Junho</option>
+                        <option value="07">Julho</option>
+                        <option value="08">Agosto</option>
+                        <option value="09">Setembro</option>
+                        <option value="10">Outubro</option>
+                        <option value="11">Novembro</option>
+                        <option value="12">Dezembro</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                        <i class="fas fa-calendar-alt"></i> Ano
+                    </label>
+                    <select id="reportYear" class="filter-select">
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2027">2027</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                        <i class="fas fa-tag"></i> Status
+                    </label>
+                    <select id="reportStatus" class="filter-select">
+                        <option value="all">Todos os Status</option>
+                        <option value="Aguardando">⏳ Aguardando</option>
+                        <option value="Em Manutenção">🔧 Em Manutenção</option>
+                        <option value="Finalizado">✅ Finalizado</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button onclick="gerarRelatorio()" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sync-alt"></i>
+                        ATUALIZAR
+                    </button>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+                <button onclick="exportarRelatorioPDF()" class="btn-pdf">
+                    <i class="fas fa-file-pdf"></i>
+                    GERAR PDF
+                </button>
+                <button onclick="exportarRelatorioJSON()" class="btn btn-backup">
+                    <i class="fas fa-file-code"></i>
+                    EXPORTAR JSON
+                </button>
+            </div>
+        </div>
+        
+        <!-- PREVIEW DO RELATÓRIO -->
+        <div class="report-preview">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem; color: #1a7a44;">
+                    <i class="fas fa-file-alt"></i>
+                    RELATÓRIO GERADO
+                </h2>
+                <span id="reportPeriodo" style="background: #f3f4f6; padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.875rem;">
+                    Carregando...
+                </span>
+            </div>
+            
+            <!-- ESTATÍSTICAS -->
+            <div id="reportStats" class="stats-report">
+                <!-- Preenchido via JS -->
+            </div>
+            
+            <!-- TABELA DE OS -->
+            <div style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem; color: #1f2937;">
+                    <i class="fas fa-list"></i>
+                    Ordens de Serviço
+                </h3>
+                <div id="reportTableContainer" style="overflow-x: auto;">
+                    <!-- Tabela preenchida via JS -->
+                </div>
+            </div>
+            
+            <!-- RESUMO TÉCNICOS -->
+            <div id="reportTecnicos" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px dashed #e5e7eb;">
+                <!-- Resumo por técnico -->
+            </div>
+            
+            <!-- RODAPÉ DO RELATÓRIO -->
+            <div id="reportFooter" style="margin-top: 2rem; text-align: center; color: #9ca3af; font-size: 0.75rem;">
+                <!-- Gerado via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CARREGAR DADOS =====
+        let ordens = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarDados();
+            gerarRelatorio();
+        });
+        
+        function carregarDados() {
+            try {
+                const dados = localStorage.getItem('capul_ti_db');
+                if (dados) {
+                    ordens = JSON.parse(dados);
+                } else {
+                    ordens = [];
+                    mostrarMensagem('Nenhuma OS encontrada', 'info');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                ordens = [];
+            }
+        }
+        
+        // ===== GERAR RELATÓRIO =====
+        function gerarRelatorio() {
+            const mes = document.getElementById('reportMonth').value;
+            const ano = document.getElementById('reportYear').value;
+            const status = document.getElementById('reportStatus').value;
+            
+            // Filtrar OS
+            let osFiltradas = ordens.filter(os => {
+                // Filtro por ano/mês
+                if (os.data) {
+                    const partes = os.data.split('/');
+                    const osMes = partes[1];
+                    const osAno = partes[2];
+                    
+                    if (ano !== 'all' && osAno !== ano) return false;
+                    if (mes !== 'all' && osMes !== mes) return false;
+                }
+                
+                // Filtro por status
+                if (status !== 'all' && os.status !== status) return false;
+                
+                return true;
+            });
+            
+            // Ordenar por data (mais recente primeiro)
+            osFiltradas.sort((a, b) => {
+                const dataA = a.data ? a.data.split('/').reverse().join('') : '';
+                const dataB = b.data ? b.data.split('/').reverse().join('') : '';
+                return dataB.localeCompare(dataA);
+            });
+            
+            // Atualizar período
+            let periodoTexto = '';
+            if (mes === 'all' && ano === 'all') periodoTexto = 'Todos os períodos';
+            else if (mes === 'all') periodoTexto = `Ano: ${ano}`;
+            else if (ano === 'all') periodoTexto = `Mês: ${getNomeMes(mes)}`;
+            else periodoTexto = `${getNomeMes(mes)}/${ano}`;
+            
+            document.getElementById('reportPeriodo').innerHTML = `<i class="fas fa-calendar"></i> ${periodoTexto}`;
+            
+            // Renderizar
+            renderizarEstatisticas(osFiltradas);
+            renderizarTabela(osFiltradas);
+            renderizarResumoTecnicos(osFiltradas);
+            renderizarRodape(osFiltradas);
+        }
+        
+        function getNomeMes(mes) {
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            return meses[parseInt(mes) - 1];
+        }
+        
+        function renderizarEstatisticas(osFiltradas) {
+            const total = osFiltradas.length;
+            const aguardando = osFiltradas.filter(o => o.status === 'Aguardando').length;
+            const emManutencao = osFiltradas.filter(o => o.status === 'Em Manutenção').length;
+            const finalizadas = osFiltradas.filter(o => o.status === 'Finalizado').length;
+            
+            const html = `
+                <div class="stat-report-card">
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Total OS</p>
+                    <p style="font-size: 2rem; font-weight: 800; color: #1a7a44;">${total}</p>
+                </div>
+                <div class="stat-report-card">
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Aguardando</p>
+                    <p style="font-size: 2rem; font-weight: 800; color: #d97706;">${aguardando}</p>
+                </div>
+                <div class="stat-report-card">
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Em Manutenção</p>
+                    <p style="font-size: 2rem; font-weight: 800; color: #2563eb;">${emManutencao}</p>
+                </div>
+                <div class="stat-report-card">
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.25rem;">Finalizadas</p>
+                    <p style="font-size: 2rem; font-weight: 800; color: #059669;">${finalizadas}</p>
+                </div>
+            `;
+            
+            document.getElementById('reportStats').innerHTML = html;
+        }
+        
+        function renderizarTabela(osFiltradas) {
+            if (osFiltradas.length === 0) {
+                document.getElementById('reportTableContainer').innerHTML = `
+                    <div style="text-align: center; padding: 3rem; background: #f9fafb; border-radius: 1rem;">
+                        <i class="fas fa-search" style="font-size: 2.5rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                        <p style="color: #6b7280;">Nenhuma OS encontrada no período</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                    <thead>
+                        <tr style="background: #1a7a44; color: white;">
+                            <th style="padding: 0.75rem; text-align: left;">Nº OS</th>
+                            <th style="padding: 0.75rem; text-align: left;">Data</th>
+                            <th style="padding: 0.75rem; text-align: left;">Cliente</th>
+                            <th style="padding: 0.75rem; text-align: left;">Equipamento</th>
+                            <th style="padding: 0.75rem; text-align: left;">Técnico</th>
+                            <th style="padding: 0.75rem; text-align: left;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            osFiltradas.forEach(os => {
+                const statusClass = 
+                    os.status === 'Finalizado' ? 'status-finalizado' : 
+                    os.status === 'Em Manutenção' ? 'status-manutencao' : 
+                    'status-aguardando';
+                
+                html += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 0.75rem; font-weight: 600;">#${os.id?.toString().slice(-6) || os.numero}</td>
+                        <td style="padding: 0.75rem;">${os.data || '—'}</td>
+                        <td style="padding: 0.75rem;">${os.cliente || '—'}</td>
+                        <td style="padding: 0.75rem;">${os.equipamento || '—'}</td>
+                        <td style="padding: 0.75rem;">${os.tecnico || '—'}</td>
+                        <td style="padding: 0.75rem;">
+                            <span class="status-badge ${statusClass}">${os.status || '—'}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('reportTableContainer').innerHTML = html;
+        }
+        
+        function renderizarResumoTecnicos(osFiltradas) {
+            const tecnicos = {};
+            
+            osFiltradas.forEach(os => {
+                if (os.tecnico) {
+                    tecnicos[os.tecnico] = (tecnicos[os.tecnico] || 0) + 1;
+                }
+            });
+            
+            if (Object.keys(tecnicos).length === 0) {
+                document.getElementById('reportTecnicos').innerHTML = `
+                    <p style="color: #6b7280; text-align: center;">Nenhum técnico atribuído</p>
+                `;
+                return;
+            }
+            
+            let html = `
+                <h3 style="margin-bottom: 1rem; color: #1f2937;">
+                    <i class="fas fa-user-cog"></i>
+                    OS por Técnico
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            `;
+            
+            for (const [tecnico, quantidade] of Object.entries(tecnicos)) {
+                html += `
+                    <div style="background: #f3f4f6; padding: 1rem; border-radius: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600;">${tecnico}</span>
+                        <span style="background: #1a7a44; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem;">
+                            ${quantidade} OS
+                        </span>
+                    </div>
+                `;
+            }
+            
+            html += `</div>`;
+            document.getElementById('reportTecnicos').innerHTML = html;
+        }
+        
+        function renderizarRodape(osFiltradas) {
+            const data = new Date();
+            const dataGeracao = data.toLocaleDateString('pt-BR');
+            const horaGeracao = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            document.getElementById('reportFooter').innerHTML = `
+                <p style="margin-bottom: 0.25rem;">Cooperativa Agropecuária de Unaí - Manutenção TI</p>
+                <p style="margin-bottom: 0.25rem;">Relatório gerado em ${dataGeracao} às ${horaGeracao}</p>
+                <p>Total de OS: ${osFiltradas.length} | Documento interno sem valor fiscal</p>
+            `;
+        }
+        
+        // ===== EXPORTAR PDF =====
+        function exportarRelatorioPDF() {
+            const elemento = document.querySelector('.report-preview');
+            const btn = event.currentTarget;
+            const textoOriginal = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="spinner"></span> GERANDO PDF...';
+            btn.disabled = true;
+            
+            const opt = {
+                margin: [0.3, 0.3, 0.3, 0.3],
+                filename: `relatorio_capul_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+            
+            setTimeout(() => {
+                html2pdf().set(opt).from(elemento).save();
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }, 300);
+        }
+        
+        // ===== EXPORTAR JSON =====
+        function exportarRelatorioJSON() {
+            const mes = document.getElementById('reportMonth').value;
+            const ano = document.getElementById('reportYear').value;
+            const status = document.getElementById('reportStatus').value;
+            
+            let osFiltradas = ordens.filter(os => {
+                if (os.data) {
+                    const partes = os.data.split('/');
+                    const osMes = partes[1];
+                    const osAno = partes[2];
+                    
+                    if (ano !== 'all' && osAno !== ano) return false;
+                    if (mes !== 'all' && osMes !== mes) return false;
+                }
+                
+                if (status !== 'all' && os.status !== status) return false;
+                return true;
+            });
+            
+            const relatorio = {
+                metadados: {
+                    sistema: 'CAPUL TI',
+                    versao: '3.0.0',
+                    gerado_em: new Date().toISOString(),
+                    mes: mes === 'all' ? 'todos' : getNomeMes(mes),
+                    ano: ano === 'all' ? 'todos' : ano,
+                    status: status === 'all' ? 'todos' : status,
+                    total_os: osFiltradas.length
+                },
+                estatisticas: {
+                    aguardando: osFiltradas.filter(o => o.status === 'Aguardando').length,
+                    em_manutencao: osFiltradas.filter(o => o.status === 'Em Manutenção').length,
+                    finalizadas: osFiltradas.filter(o => o.status === 'Finalizado').length
+                },
+                ordens: osFiltradas
+            };
+            
+            const jsonString = JSON.stringify(relatorio, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `relatorio_capul_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function mostrarMensagem(msg, tipo) {
+            // Implementar toast
+            alert(msg);
+        }
+    </script>
+</body>
+</html>
