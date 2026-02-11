@@ -20,8 +20,8 @@
         <div class="navbar-container container">
             <div class="navbar-logo">
                 <img src="https://i.ibb.co/XrCV39nT/image-removebg-preview-1.png" alt="Logo Cooperativa" class="logo-img">
-                <span class="logo-text">TI - MANUNTENÇÃO CAPUL</span>
-                <span class="logo-text-mobile">TI CAPUL</span>
+                <span class="logo-text">TI - MANUTENÇÃO CAPUL</span>
+                <span class="logo-text-mobile">TI - CAPUL</span>
             </div>
             <button onclick="toggleModal('modal-os')" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
@@ -86,6 +86,14 @@
         </div>
     </main>
 
+    <!-- Botões Flutuantes -->
+    <div class="floating-buttons">
+        <button onclick="openLoginModal()" class="btn btn-history">
+            <i class="fas fa-archive"></i>
+            <span>Histórico</span>
+        </button>
+    </div>
+
     <!-- Modal Nova OS -->
     <div id="modal-os" class="modal hidden">
         <div class="modal-content">
@@ -144,6 +152,52 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Login Histórico -->
+    <div id="modal-login" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-lock" style="color: #10b981;"></i> 
+                    Acesso ao Histórico
+                </h2>
+                <button onclick="toggleModal('modal-login')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-form">
+                <div class="form-group">
+                    <label class="form-label">Senha de Acesso</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-key" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        <input type="password" id="historico-senha" placeholder="Digite a senha" class="form-input" style="padding-left: 40px;">
+                    </div>
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Senha padrão: <strong>coop@2026</strong>
+                    </p>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="toggleModal('modal-login')" class="btn btn-outline">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="verificarSenhaHistorico()" class="btn btn-success">
+                        <i class="fas fa-unlock-alt"></i>
+                        Acessar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Histórico de JSONs -->
+    <div id="modal-historico-json" class="modal hidden">
+        <!-- Conteúdo será inserido via JS -->
+    </div>
+
+    <!-- Modal Finalizar OS (será inserido via JS) -->
+    <!-- Não colocar nada aqui - o JS cria automaticamente -->
 
     <!-- Print Area (hidden) -->
     <div id="print-area" class="print-only"></div>
