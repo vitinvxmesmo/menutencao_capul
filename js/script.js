@@ -1,20 +1,39 @@
 // ===== CONFIGURAÇÕES =====
-const SENHA_HISTORICO = '@*ihtc39'; // Senha para acessar o histórico
+const SENHA_HISTORICO = 'coop@2026'; // Senha para acessar o histórico
 
 // ===== STATE MANAGEMENT =====
-let ordens = JSON.parse(localStorage.getItem('tech_os_db')) || [];
+// TENTA CARREGAR DO LOCALSTORAGE, SE NÃO TIVER, CRIA ARRAY VAZIO
+let ordens = [];
+
+function carregarOrdens() {
+    try {
+        const dados = localStorage.getItem('tech_os_db');
+        if (dados) {
+            ordens = JSON.parse(dados);
+            console.log('✅ OS carregadas do localStorage:', ordens.length);
+        } else {
+            ordens = [];
+            console.log('📁 Nenhuma OS encontrada no localStorage');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar OS:', error);
+        ordens = [];
+    }
+}
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Sistema iniciando...');
+    carregarOrdens(); // CARREGA AS OS PRIMEIRO
     init();
     setupEventListeners();
-    // Garante que o modal de finalização existe
     criarModalFinalizar();
 });
 
 function init() {
     renderOS();
     updateStats();
+    console.log('✅ Sistema inicializado com', ordens.length, 'OS');
 }
 
 function setupEventListeners() {
@@ -24,13 +43,17 @@ function setupEventListeners() {
     // Search and filter
     document.getElementById('searchInput').addEventListener('input', renderOS);
     document.getElementById('filterStatus').addEventListener('change', renderOS);
+    
+    // Salvar antes de fechar (backup)
+    window.addEventListener('beforeunload', function() {
+        saveData();
+    });
 }
 
 // ===== MODAL FUNCTIONS =====
 function toggleModal(id) {
     const modal = document.getElementById(id);
     if (modal) {
-        console.log('Toggling modal:', id); // Debug
         modal.classList.toggle('hidden');
         
         // Reset form when closing
@@ -38,8 +61,6 @@ function toggleModal(id) {
             const form = modal.querySelector('form');
             if (form) form.reset();
         }
-    } else {
-        console.error('Modal não encontrado:', id);
     }
 }
 
@@ -329,8 +350,6 @@ function criarModalFinalizar() {
         form.parentNode.replaceChild(newForm, form);
         newForm.addEventListener('submit', handleFinalizarOS);
     }
-    
-    console.log('Modal de finalização criado!'); // Debug
 }
 
 // ===== HANDLE FINALIZAR OS =====
@@ -363,7 +382,7 @@ function handleFinalizarOS(e) {
             valor: ordens[index].valor_total
         });
         
-        saveData();
+        saveData(); // SALVA IMEDIATAMENTE
         
         // CRIA O JSON E SALVA NO HISTÓRICO VIRTUAL
         const os = ordens[index];
@@ -391,8 +410,11 @@ function handleFormSubmit(e) {
     
     const formData = new FormData(e.target);
     
+    // GERA UM ID ÚNICO GARANTIDO
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    
     const novaOS = {
-        id: Date.now(),
+        id: id,
         data: new Date().toLocaleDateString('pt-BR'),
         hora: new Date().toLocaleTimeString('pt-BR', { 
             hour: '2-digit', 
@@ -413,7 +435,7 @@ function handleFormSubmit(e) {
     };
 
     ordens.unshift(novaOS);
-    saveData();
+    saveData(); // SALVA IMEDIATAMENTE
     
     e.target.reset();
     toggleModal('modal-os');
@@ -422,10 +444,27 @@ function handleFormSubmit(e) {
     
     renderOS();
     updateStats();
+    
+    console.log('✅ Nova OS criada e salva:', novaOS);
 }
 
+// ===== FUNÇÃO DE SALVAR REFORÇADA =====
 function saveData() {
-    localStorage.setItem('tech_os_db', JSON.stringify(ordens));
+    try {
+        localStorage.setItem('tech_os_db', JSON.stringify(ordens));
+        console.log('💾 Dados salvos no localStorage:', ordens.length, 'OS');
+        
+        // VERIFICA SE SALVOU CORRETAMENTE
+        const verificacao = localStorage.getItem('tech_os_db');
+        if (verificacao) {
+            console.log('✅ Verificação: dados salvos com sucesso');
+        } else {
+            console.error('❌ Falha na verificação do salvamento');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao salvar dados:', error);
+        showNotification('Erro ao salvar OS!', 'error');
+    }
 }
 
 function updateStats() {
@@ -458,7 +497,7 @@ function changeStatus(id, newStatus) {
             acao: `Status alterado: ${oldStatus} → ${newStatus}`
         });
         
-        saveData();
+        saveData(); // SALVA IMEDIATAMENTE
         
         renderOS();
         updateStats();
@@ -468,8 +507,6 @@ function changeStatus(id, newStatus) {
 }
 
 function openFinalizarModal(id) {
-    console.log('Abrindo modal de finalização para OS:', id); // Debug
-    
     // Garante que o modal existe
     criarModalFinalizar();
     
@@ -478,18 +515,14 @@ function openFinalizarModal(id) {
     
     if (modal && input) {
         input.value = id;
-        // Remove a classe hidden
         modal.classList.remove('hidden');
-        console.log('Modal aberto!'); // Debug
-    } else {
-        console.error('Modal ou input não encontrado:', { modal: !!modal, input: !!input });
     }
 }
 
 function deleteOS(id) {
     if (confirm('⚠️ Deseja realmente excluir esta Ordem de Serviço?')) {
         ordens = ordens.filter(o => o.id !== id);
-        saveData();
+        saveData(); // SALVA IMEDIATAMENTE
         renderOS();
         updateStats();
         showNotification('🗑️ Ordem de serviço excluída!', 'success');
@@ -695,7 +728,6 @@ function createOSCard(os) {
 
 // ===== NOTIFICATION SYSTEM =====
 function showNotification(message, type = 'info') {
-    // Remove notificação anterior se existir
     const oldNotification = document.querySelector('.notification');
     if (oldNotification) oldNotification.remove();
     
