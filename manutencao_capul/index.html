@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>Cooperativa Agropecuária de Unaí - Manutenção TI</title>
+    
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container container">
+            <div class="navbar-logo">
+                <img src="https://i.ibb.co/XrCV39nT/image-removebg-preview-1.png" alt="Logo Cooperativa" class="logo-img">
+                <span class="logo-text">COOPERATIVA AGROPECUÁRIA DE UNAÍ</span>
+                <span class="logo-text-mobile">COOP UNAÍ</span>
+            </div>
+            <button onclick="toggleModal('modal-os')" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Nova OS</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content container">
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="card card-pending">
+                <div class="card-content">
+                    <div>
+                        <p class="card-label">Aguardando</p>
+                        <h3 id="stat-pending" class="card-value">0</h3>
+                    </div>
+                    <i class="fas fa-clock card-icon"></i>
+                </div>
+            </div>
+            
+            <div class="card card-progress">
+                <div class="card-content">
+                    <div>
+                        <p class="card-label">Em Manutenção</p>
+                        <h3 id="stat-progress" class="card-value">0</h3>
+                    </div>
+                    <i class="fas fa-tools card-icon"></i>
+                </div>
+            </div>
+            
+            <div class="card card-done">
+                <div class="card-content">
+                    <div>
+                        <p class="card-label">Finalizadas</p>
+                        <h3 id="stat-done" class="card-value">0</h3>
+                    </div>
+                    <i class="fas fa-check-circle card-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Buscar cliente ou equipamento..." class="search-input">
+            </div>
+            
+            <select id="filterStatus" class="filter-select">
+                <option value="all">Todos os Status</option>
+                <option value="Aguardando">Aguardando</option>
+                <option value="Em Manutenção">Em Manutenção</option>
+                <option value="Finalizado">Finalizado</option>
+            </select>
+        </div>
+
+        <!-- OS List -->
+        <div id="os-list" class="os-grid">
+            <!-- OS cards serão inseridos via JS -->
+        </div>
+    </main>
+
+    <!-- Botões Flutuantes -->
+    <div class="floating-buttons">
+        <button onclick="openLoginModal()" class="btn btn-history">
+            <i class="fas fa-archive"></i>
+            <span>Histórico</span>
+        </button>
+    </div>
+
+    <!-- Modal Nova OS -->
+    <div id="modal-os" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nova Ordem de Serviço</h2>
+                <button onclick="toggleModal('modal-os')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="osForm" class="modal-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Cliente *</label>
+                        <input type="text" name="cliente" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Telefone/WhatsApp *</label>
+                        <input type="text" name="telefone" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Equipamento *</label>
+                        <input type="text" name="equipamento" placeholder="Ex: Notebook Dell Inspiron" required class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Serviço</label>
+                        <select name="tipo" class="form-select">
+                            <option value="Balcão">Urgente</option>
+                            <option value="Visita">Visita Técnica</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Defeito Relatado / Solicitação *</label>
+                    <textarea name="defeito" rows="3" required class="form-textarea"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Observações Técnicas</label>
+                    <textarea name="obs" rows="2" class="form-textarea" placeholder="Acessórios deixados, estado físico, etc."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="toggleModal('modal-os')" class="btn btn-outline">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save mr-2"></i>
+                        Salvar OS
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Login Histórico -->
+    <div id="modal-login" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-lock" style="color: #10b981;"></i> 
+                    Acesso ao Histórico
+                </h2>
+                <button onclick="toggleModal('modal-login')" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-form">
+                <div class="form-group">
+                    <label class="form-label">Senha de Acesso</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-key" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        <input type="password" id="historico-senha" placeholder="Digite a senha" class="form-input" style="padding-left: 40px;">
+                    </div>
+                    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+                        <i class="fas fa-info-circle"></i> Senha padrão: <strong>coop@2026</strong>
+                    </p>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="toggleModal('modal-login')" class="btn btn-outline">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="verificarSenhaHistorico()" class="btn btn-success">
+                        <i class="fas fa-unlock-alt"></i>
+                        Acessar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Histórico de JSONs -->
+    <div id="modal-historico-json" class="modal hidden">
+        <!-- Conteúdo será inserido via JS -->
+    </div>
+
+    <!-- Modal Finalizar OS (será inserido via JS) -->
+    <!-- Não colocar nada aqui - o JS cria automaticamente -->
+
+    <!-- Print Area (hidden) -->
+    <div id="print-area" class="print-only"></div>
+
+    <!-- JavaScript Externo -->
+    <script src="/js/script.js"></script>
+</body>
+</html>
