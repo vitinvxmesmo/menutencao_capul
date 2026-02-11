@@ -1,5 +1,5 @@
 // ===== CONFIGURAÇÕES =====
-const SENHA_HISTORICO = 'coop@2026'; // Senha para acessar o histórico
+const SENHA_HISTORICO = '@*ihtc39'; // Senha para acessar o histórico
 
 // ===== STATE MANAGEMENT =====
 // TENTA CARREGAR DO LOCALSTORAGE, SE NÃO TIVER, CRIA ARRAY VAZIO
@@ -780,3 +780,4 @@ window.baixarTodosJSON = baixarTodosJSON;
 window.verHistoricoJSON = verHistoricoJSON;
 window.openFinalizarModal = openFinalizarModal;
 window.criarModalFinalizar = criarModalFinalizar;
+
